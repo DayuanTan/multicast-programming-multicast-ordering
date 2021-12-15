@@ -40,7 +40,7 @@ For multicast, we care about the order issue. There arre 3 types multicast order
 ![](img/total_order_update.png)
 
 
-Examples of FIFO,  Causal and Total ordering refer to [Prof. Banerjee's slides]().
+Examples of FIFO,  Causal and Total ordering refer to [Prof. Banerjee's slides](slides).
 
 
 # 3. Assignment step details 
@@ -340,6 +340,16 @@ if (read(receiver_socket_fd , receiver_read_buffer, 1024) < 0){
     exit(EXIT_FAILURE);
 }
 printf("Receiver: read: '%s'\n",receiver_read_buffer );
+
+or
+
+socklen_t receiver_addr_length = sizeof(receiver_addr);
+if (recvfrom(multicast_socket_fd, receiver_read_buffer, 1024, 0, (struct sockaddr *)&receiver_addr, &receiver_addr_length) < 0){
+    perror("Receiver: recvfrom() error");
+    exit(EXIT_FAILURE);
+}
+printf("Receiver: read: '%s'\n",receiver_read_buffer );
+memset(receiver_read_buffer, '\0', strlen(receiver_read_buffer));
 ```
 
 The below screenshot shows how I ran it with 1 sender 3 receiverrs. 
@@ -387,3 +397,7 @@ Reference:
 1. Cpp multi-thread https://www.geeksforgeeks.org/multithreading-in-cpp/.
 
 # 4.3 Multicast ordering (Phase 3)
+
+Implement vector clocks data structure
+define message content
+send message
