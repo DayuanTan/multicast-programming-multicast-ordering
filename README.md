@@ -1,6 +1,6 @@
 # Multicast Programming and Multicast Ordering Implementation
 
-Firstly I implemented the multicast cpp implementation in distributed systems.
+Firstly I implemented the multicast cpp implementation in distributed systems. Code are in [p2_multicast_programming](p2_multicast_programming) dir.
 
 Secondly, based on that, I implemented multicast ordering for DS.
 
