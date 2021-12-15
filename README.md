@@ -1,6 +1,6 @@
 # Multicast Programming and Multicast Ordering Implementation
 
-Firstly I implemented the multicast cpp implementation in distributed systems. Code are in [p2_multicast_programming](p2_multicast_programming) dir.
+Firstly I implemented the multicast cpp implementation in distributed systems. Code are in [p2_multicast_programming](p2_multicast_programming) dir, and [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir. The latter one uses one process with 2 threads. One for sending messages while another one for continuously receiving messages from multicast group. 
 
 Secondly, based on that, I implemented multicast ordering for DS.
 
@@ -51,7 +51,7 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 # 4. Implementation Explanation
 
 1. Firstly I Implemented multicast programming for 1 sender and multiple receivers using sender.cpp and receiver.cpp files.
-2. Secondly I merged them into one process with 2 threads (send and receive for each). This is required in assignment 2.
+2. Secondly I merged them into one process with 2 threads. One for sending messages while another one for continuously receiving messages from multicast group. This is required in assignment 2.
 3. Thridly I implemented caucal ordering.
 
 
@@ -347,7 +347,7 @@ References:
 
 Cpp multi-thread refers to [here](https://www.geeksforgeeks.org/multithreading-in-cpp/).
 
-Code are in [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir.
+Code are in [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir. One thread for sending messages while another thread for continuously receiving messages from multicast group.
 
 I implemented it in 2 ways. They both work well:
 
