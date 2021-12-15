@@ -52,7 +52,7 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 
 # 4.1 Multicast programming
 
-First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir.). It is little different than [server-client socket programming](proj1).
+First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir.). It is little different than [server-client socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization).
 
 Note: In below blocks, each block will have 3 lines of code, they all will follow this order and color style:
 ```diff
@@ -114,7 +114,7 @@ After socket()  creates a [socket](https://man7.org/linux/man-pages/man7/socket.
 - For the full list of **socket layer options** please refer to the [Socket options on this page](https://man7.org/linux/man-pages/man7/socket.7.html). They are *SOL_SOCKET level (which is 2nd argument)*. For example ```setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))```.
 - For the full list of **protocol options** please refer to the [Socket options on this page](https://man7.org/linux/man-pages/man7/ip.7.html). They are *IPPROTO_IP level*. For example ```setsockopt(server_socket_fd, IPPROTO_IP, IP_MULTICAST_LOOP, 0, 1)```. 
 
-It's ok to don't change them in most cases. In previous [server-client socket programming](proj1) we have used SO_REUSEADDR | SO_REUSEPORT in *SOL_SOCKET level* to avoid address conflict. In multicast programming we need change more configurations in *IPPROTO_IP level*.  
+It's ok to don't change them in most cases. In previous [server-client socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) we have used SO_REUSEADDR | SO_REUSEPORT in *SOL_SOCKET level* to avoid address conflict. In multicast programming we need change more configurations in *IPPROTO_IP level*.  
 
 The actual fucntion we use set or get socket layer or protocol options are:
 [getsockopt(2) and setsockopt(2)](https://man7.org/linux/man-pages/man2/getsockopt.2.html): 
@@ -138,7 +138,7 @@ Sending IPv4 Multicast Datagrams：
     ```
     where *addr* is the local IP address of the desired outgoing interface. Revert to the default interface by specifying the address *INADDR_ANY*.
 
-    To [check local multicast capable interface](https://www.thegeekdiary.com/how-to-configure-multicast-on-an-ip-address-interface/).
+    To [check local multicast capable interface](https://www.thegeekdiary.com/how-to-configure-multicast-on-an-ip-address-interface/), use ```ifconfig```.
 
     Mine is 192.168.169.154 with "UP ... MULTICAST":
     ```shell
