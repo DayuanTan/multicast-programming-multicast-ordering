@@ -48,11 +48,11 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 
 ![](img/total_order_update.png)
 
-# 4. Implementation
+# 4. Implementation Explanation
 
-## 4.1 Multicast programming
+# 4.1 Multicast programming
 
-First of all we need **to implement multicast**. It is little different than [server-client socket programming](proj1).
+First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir.). It is little different than [server-client socket programming](proj1).
 
 Note: In below blocks, each block will have 3 lines of code, they all will follow this order and color style:
 ```diff
@@ -65,7 +65,7 @@ function definition, or parameter order or definition
 
 IP multicasting provides the capability for an application to send a single IP datagram that a **group** of hosts in a network can receive.  The hosts that are in the group may reside on a single subnet or may be on different subnets that have been connected by multicast capable routers.
 
-### 4.1.1. Multicast IP addresses range 
+## 4.1.1. Multicast IP addresses range 
 
 Multicasting has its own Class D IP addressing scheme, controlled and assigned by the Internet Assigned Numbers Authority (IANA). This means that all IP multicasts are in the **range of 224.0.0.0 to 239.255.255.255**<sup>[Range](https://www.sciencedirect.com/topics/computer-science/multicasting)</sup>. Multicast IP Routing protocols are used to distribute data (for example, audio/video streaming broadcasts) to multiple recipients. Using multicast, a source can send a single copy of data to a single multicast address, which is then distributed to an entire group of recipients<sup>[Usage](https://www.metaswitch.com/knowledge-center/reference/what-is-multicast-ip-routing)</sup>. Multicast routers should not forward any multicast datagram with destination addresses in this range (224.0.0.0 and 224.0.0.255, inclusive), regardless of its TTL<sup>[IANA](https://www.iana.org/assignments/multicast-addresses/multicast-addresses.xhtml)</sup>.
 
@@ -82,7 +82,7 @@ group_address.sin_port = htons(5555);
 ```
 
 
-### 4.1.2 Use *SOCK_STREAM* for multicasting 
+## 4.1.2 Use *SOCK_STREAM* for multicasting 
 
 For multicasting, it must be a *socket* of the family AF_INET and its type may be either SOCK_DGRAM or SOCK_RAW. The most common use is with **SOCK_DGRAM** sockets. Each multicast transmission is sent from a single network interface, even if the host has more than one multicasting-capable interface. It is a one-to-many transmission method.  You cannot use connection-oriented sockets of type SOCK_STREAM for multicasting.
 ```diff
@@ -92,9 +92,9 @@ int socket(int domain, int type, int protocol);
 - if ((server_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0){err socket failed}
 
 
-+ // Creating socket file descriptor (IPv4, UDP, IP)
 + // For multicast it must be family AF_INET, and its type may be either SOCK_DGRAM or SOCK_RAW. The most common use is with SOCK_DGRAM sockets
-+ if ((server_socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == 0){err socket failed}
++ if ((sender_socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == 0) // (IPv4, UDP, IP)
++ { perror }
 ```
 
 
@@ -105,8 +105,10 @@ udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
 raw_socket = socket(AF_INET, SOCK_RAW, protocol);
 ```
 
+For this part, sender.cpp and receiver.cpp are  same.
 
-### 4.1.3 Use *setsockopt()* to change default configurations of ***socket layer and protocol options***
+
+## 4.1.3 Use *setsockopt()* to change default configurations of ***socket layer and protocol options***
 
 After socket()  creates a [socket](https://man7.org/linux/man-pages/man7/socket.7.html), it has many defualt configurations for both socket layer and protocol options. These configurations are also called "options", "flags" somewhere.
 - For the full list of **socket layer options** please refer to the [Socket options on this page](https://man7.org/linux/man-pages/man7/socket.7.html). They are *SOL_SOCKET level (which is 2nd argument)*. For example ```setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))```.
@@ -199,10 +201,22 @@ Receiving IPv4 Multicast Datagrams：
 
     Before a host can receive IP multicast datagrams, the host must become a member of one or more IP multicast groups. A process can ask the host to join a multicast group by using the following socket option:
 
-
+    ````cpp
+    struct ip_mreq mreq;
+    setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq))
+    ````
+    where *mreq* is the structure:
+    ```
+    struct ip_mreq {
+        struct in_addr imr_multiaddr;   /* multicast group to join */
+        struct in_addr imr_interface;   /* interface to join on */
+    }
+    ```
+    Each membership is associated with a single interface. You can join the same group on more than one interface. Specify the imr_interface address as INADDR_ANY to choose the default multicast interface. You can also specify one of the host's local addresses to choose a particular multicast-capable interface.
 
 - ***IP_DROP_MEMBERSHIP***:  Leaves the multicast group specified.
 
+My code for setsockopt part of sender.cpp:
 ```diff
 int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_len);
 
@@ -211,32 +225,108 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 
 + // Optional: it helps in reuse of address and port. Prevents error such as: “address already in use”.
 + int opt = 1; // for setsockopt
-+ if (setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0){
-+    perror("Server: setsockopt SOL_SOCKET");
-+    exit(EXIT_FAILURE);
++ if (setsockopt(sender_socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0){
++     perror("Sender: setsockopt SOL_SOCKET");
++     exit(EXIT_FAILURE);
 + }
 + // For multicast, the level (2nd param) should be IPPROTO_IP which has multiple options. 
 + // IP_MULTICAST_LOOP: 0 if you want the data you send to be looped back to your host, 1 if not. Default is 0. We don't need to change.
 + // IP_MULTICAST_TTL: Sets the Time To Live (TTL) in the IP header for outgoing multicast datagrams. 0 samehost. 1 same subnet. Default is 1. 
 + u_char ttl = '0'; // because we use only one machine 
-+ if (setsockopt(server_socket_fd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) < 0)                                              
++ if (setsockopt(sender_socket_fd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) < 0)                                              
 + {
-+    perror("Server: setsockopt IPPROTO_IP IP_MULTICAST_TTL");
-+    exit(EXIT_FAILURE);
++     perror("Sender: setsockopt IPPROTO_IP IP_MULTICAST_TTL");
++     exit(EXIT_FAILURE);
 + }
 + /* Set local interface for outbound multicast datagrams. */
 + /* The IP address specified must be associated with a local multicast capable interface. */
 + struct in_addr localInterface;
 + localInterface.s_addr = inet_addr("192.168.169.154"); // On linux use ifconfig to check "UP ... MULTICAST"
-+ if(setsockopt(sd, IPPROTO_IP, IP_MULTICAST_IF, (char *)&localInterface, sizeof(localInterface)) < 0)
++ if(setsockopt(sender_socket_fd, IPPROTO_IP, IP_MULTICAST_IF, (char *)&localInterface, sizeof(localInterface)) < 0)
 + {
-+    perror("Server: setsockopt IPPROTO_IP IP_MULTICAST_IF");
-+    exit(EXIT_FAILURE);
-+ }   
++     perror("Sender: setsockopt IPPROTO_IP IP_MULTICAST_IF");
++     exit(EXIT_FAILURE);
++ }
 ```
 
+My code for setsockopt part of receiver.cpp:
+```diff
+int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_len);
+
+-
+
++ // Optional: it helps in reuse of address and port. Prevents error such as: “address already in use”.
++ int opt = 1; // for setsockopt
++ if (setsockopt(receiver_socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0){
++     perror("Receiver: setsockopt SOL_SOCKET");
++     exit(EXIT_FAILURE);
++ }
+
++ /* Bind to the proper port number with the IP address specified as INADDR_ANY. */
++ struct sockaddr_in receiver_addr;
++ receiver_addr.sin_family = AF_INET;
++ receiver_addr.sin_addr.s_addr = INADDR_ANY; //is localhost
++ receiver_addr.sin_port = htons(PORT); 
++ // Forcefully attaching socket to the port 8080
++ if (bind(receiver_socket_fd, (struct sockaddr *)&receiver_addr, sizeof(receiver_addr))<0)
++ {
++     perror("Receiver: bind failed");
++     exit(EXIT_FAILURE);
++ } 
+
++ /* Join the multicast group 226.1.1.1 on the local interface 192.168.169.154 interface. */
++ /* Note that this IP_ADD_MEMBERSHIP option must be */
++ /* called for each local interface over which the multicast */
++ /* datagrams are to be received. */
++ struct ip_mreq group;
++ group.imr_multiaddr.s_addr = inet_addr("226.1.1.1");
++ group.imr_interface.s_addr = inet_addr("192.168.169.154");
++ if (setsockopt(receiver_socket_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&group, sizeof(group)) < 0)
++ {
++     perror("Receiver: Adding multicast group error");
++     exit(EXIT_FAILURE);
++ }
+
+
+```
+
+## 4.1.4 send/multicast
+
+Use sendto() for sending data.
+
+```cpp
+// // sending a message to client/multicast
+const char *msg = "Hello from sender, anyone in this group should recerve this.";
+// sendto(client_sockets[i] , msg , strlen(msg) , 0 );
+/* Send a message to the multicast group specified by the group_address sockaddr-structure. */
+if(sendto(sender_socket_fd, msg, strlen(msg), 0, (struct sockaddr*)&groupSock, sizeof(groupSock)) < 0)
+{
+    perror("Sender: Sending datagram message error");
+    exit(EXIT_FAILURE);
+}
+```
+
+## 4.1.5 receive
+```cpp
+// receiving form multicast
+if (read(receiver_socket_fd , receiver_read_buffer, 1024) < 0){
+    perror("Receiver: read() error");
+    exit(EXIT_FAILURE);
+}
+printf("Receiver: read: '%s'\n",receiver_read_buffer );
+```
+
+The below screenshot shows how I ran it with 1 sender 3 receiverrs. 
+1. Run ```make```.
+2. Run ```./receiver``` in multiple terminals. 
+3. Then run ```./sender``` in multiple ternimals. 
+4. 
+(This implementation only receives one message you can modify it to receive multiple messages easily.)
+
+![](img/multicast_run.png)
 
 References:
 1. SYNOPSIS section in https://man7.org/linux/man-pages/man7/ip.7.html
 2. *IPPROTO_IP level* options/flags https://tldp.org/HOWTO/Multicast-HOWTO-6.html
 3. Oracle Using Multicast - send, receive IPv4 Multicast Datagrams https://docs.oracle.com/cd/E23824_01/html/821-1602/sockets-137.html
+4. Multicast Sockets - Programming Tips http://www.cs.unc.edu/~jeffay/dirt/FAQ/comp249-001-F99/mcast-socket.html
