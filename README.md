@@ -349,11 +349,11 @@ Cpp multi-thread refers to [here](https://www.geeksforgeeks.org/multithreading-i
 
 Code are in [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir.
 
-I implemented it in multiple ways. Note the difference between them:
+I implemented it in 2 ways. They both work well:
 
-- In try1 version I used **same** socket_fd for sender and receiver threads. Receiver receives multiple messages.
-- In try2 version I used **different** socket_fd for sender and receiver threads. In this version sender() and receiver() function are identical to sender.cpp and receiver.cpp in 4.1 section. Receiver receives only 1 messages.
-- The try3 version is an extension of try1 version and make the receiver in a loop to receive multiple messages. **This is the base for next phase**.
+- In try1 version I used **same** socket_fd for sender and receiver threads. 
+- In try2 version I used **different** socket_fd for sender and receiver threads. In this version sender() and receiver() function are identical to sender.cpp and receiver.cpp in 4.1 section with small modification about loop for sendto and recvfrom. 
+
 
 The below screenshot shows how I ran it: 
 1. Run ```make```.
