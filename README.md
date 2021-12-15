@@ -6,11 +6,13 @@ Cpp implementation of multicast in distributed systems.
 
 All tests are on Ubuntu 16.04 LTS, g++ (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609. -std=c++11.
 
+# 1. Assignment
+Implement the causal ordered multicasting for the distributed system. Create two threads for each process, one for sending the multicast message to other nodes and one for listening to its communication port. Use vector clocks to enforce the order of messages. Once a process delivers a received message to a user, it prints out the message on screen. You can assume that the number of processes (machines) is fixed (equal to or larger than 3) and processes will not fail, join, or leave the distributed system. Implement two versions of this program, one without causally ordered multicasting and one with this feature. Compare the results of the two programs.
 
-# 1. Background Knowledge Review
+# 2. Background Knowledge Review
 
 
-## 1.1 Broadcast, Multicast, Unicast
+## 2.1 Broadcast, Multicast, Unicast
 
 The 3 types of communication forms in DS are listed below. In this project all are needed.
 - Broadcast, message sent to all processes (anywhere)
@@ -24,12 +26,10 @@ For multicast, we care about the order issue. There arre 3 types multicast order
 
 
 
-# 2. Assignment step details 
-
-Implement the causal ordered multicasting for the distributed system. Create two threads for each process, one for sending the multicast message to other nodes and one for listening to its communication port. Use vector clocks to enforce the order of messages. Once a process delivers a received message to a user, it prints out the message on screen. You can assume that the number of processes (machines) is fixed (equal to or larger than 3) and processes will not fail, join, or leave the distributed system. Implement two versions of this program, one without causally ordered multicasting and one with this feature. Compare the results of the two programs.
+# 3. Assignment step details 
 
 
-## 2.1 Steps for assignment 2 - Multicast ordering
+## 3.1 Steps for assignment 2 - Multicast ordering
 
 This part asks for implementing two of FIFO ordering, Causal ordering and Total ordering.
 
@@ -46,9 +46,9 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 
 ![](img/total_order_update.png)
 
-# 3. Implementation
+# 4. Implementation
 
-## 3.1 Multicast programming
+## 4.1 Multicast programming
 
 First of all we need **to implement multicast**. It is little different than [server-client socket programming](proj1).
 
@@ -63,7 +63,7 @@ function definition, or parameter order or definition
 
 IP multicasting provides the capability for an application to send a single IP datagram that a **group** of hosts in a network can receive.  The hosts that are in the group may reside on a single subnet or may be on different subnets that have been connected by multicast capable routers.
 
-### 3.1.1. Multicast IP addresses range 
+### 4.1.1. Multicast IP addresses range 
 
 Multicasting has its own Class D IP addressing scheme, controlled and assigned by the Internet Assigned Numbers Authority (IANA). This means that all IP multicasts are in the **range of 224.0.0.0 to 239.255.255.255**<sup>[Range](https://www.sciencedirect.com/topics/computer-science/multicasting)</sup>. Multicast IP Routing protocols are used to distribute data (for example, audio/video streaming broadcasts) to multiple recipients. Using multicast, a source can send a single copy of data to a single multicast address, which is then distributed to an entire group of recipients<sup>[Usage](https://www.metaswitch.com/knowledge-center/reference/what-is-multicast-ip-routing)</sup>. Multicast routers should not forward any multicast datagram with destination addresses in this range (224.0.0.0 and 224.0.0.255, inclusive), regardless of its TTL<sup>[IANA](https://www.iana.org/assignments/multicast-addresses/multicast-addresses.xhtml)</sup>.
 
@@ -80,7 +80,7 @@ group_address.sin_port = htons(5555);
 ```
 
 
-### 3.1.2 Use *SOCK_STREAM* for multicasting 
+### 4.1.2 Use *SOCK_STREAM* for multicasting 
 
 For multicasting, it must be a *socket* of the family AF_INET and its type may be either SOCK_DGRAM or SOCK_RAW. The most common use is with **SOCK_DGRAM** sockets. Each multicast transmission is sent from a single network interface, even if the host has more than one multicasting-capable interface. It is a one-to-many transmission method.  You cannot use connection-oriented sockets of type SOCK_STREAM for multicasting.
 ```diff
@@ -104,7 +104,7 @@ raw_socket = socket(AF_INET, SOCK_RAW, protocol);
 ```
 
 
-### 3.1.2 Use *setsockopt()* to change default configurations of ***socket layer and protocol options***
+### 4.1.3 Use *setsockopt()* to change default configurations of ***socket layer and protocol options***
 
 After socket()  creates a [socket](https://man7.org/linux/man-pages/man7/socket.7.html), it has many defualt configurations for both socket layer and protocol options. These configurations are also called "options", "flags" somewhere.
 - For the full list of **socket layer options** please refer to the [Socket options on this page](https://man7.org/linux/man-pages/man7/socket.7.html). They are *SOL_SOCKET level (which is 2nd argument)*. For example ```setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))```.
