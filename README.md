@@ -355,4 +355,9 @@ I implemented it in multiple ways. Note the difference between them:
 - In try2 version I used **different** socket_fd for sender and receiver threads. In this version sender() and receiver() function are identical to sender.cpp and receiver.cpp in 4.1 section. Receiver receives only 1 messages.
 - The try3 version is an extension of try1 version and make the receiver in a loop to receive multiple messages. **This is the base for next phase**.
 
+The below screenshot shows how I ran it: 
+1. Run ```make```.
+2. Run ```./multicast_try1``` in first terminal. It works well.
+3. Then run ```./multicast_try2``` in second terminals. The 2nd terminal got 10 messages while the 1st terminal got 10 more messages (bc the receiver of 1st terminal didn't stop).
+
 ![](img/multicast_hangon.png)
