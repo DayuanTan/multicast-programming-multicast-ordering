@@ -2,16 +2,17 @@
 
 Firstly I implemented the multicast cpp implementation in distributed systems. Code are in [p2_multicast_programming](p2_multicast_programming) dir, and [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir. The latter one uses one process with 2 threads. One for sending messages while another one for continuously receiving messages from multicast group. 
 
-Secondly, based on that, I implemented multicast ordering for DS.
+Secondly, based on that, I implemented multicast ordering for DS, including FIFO ordering, causal ordering and total ordering.
 
 ## Environments:
 
 All tests are on Ubuntu 16.04 LTS, g++ (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609. -std=c++11.
 
-# 1. Assignment
+# 1. Assignment 
 Implement the causal ordered multicasting for the distributed system. Create two threads for each process, one for sending the multicast message to other nodes and one for listening to its communication port. Use vector clocks to enforce the order of messages. Once a process delivers a received message to a user, it prints out the message on screen. You can assume that the number of processes (machines) is fixed (equal to or larger than 3) and processes will not fail, join, or leave the distributed system. Implement two versions of this program, one without causally ordered multicasting and one with this feature. Compare the results of the two programs.
 
-More assignment details: [PDF here](Project2_Fall2021.pdf).
+
+This assignment belongs to Proj2-Assignment2. More assignment details: [PDF here](Project2_Fall2021.pdf).
 
 # 2. Background Knowledge Review
 
@@ -21,20 +22,32 @@ More assignment details: [PDF here](Project2_Fall2021.pdf).
 The 3 types of communication forms in DS are listed below. In this project all are needed.
 - Broadcast, message sent to all processes (anywhere).
 - Multicast, message sent to a group of processes. This will be introduced in section 4.1.
-- Unicast, message sent from one sender process to one receiver process. This has been done in [proj1](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) and [proj2-assign1](https://github.com/DayuanTan/berkeley-algorithm-implementation).
+- Unicast, message sent from one sender process to one receiver process. This has been done in [proj1-bank-accounts-mng](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) and [proj2-assign1-berkeley (Phase 1)](https://github.com/DayuanTan/berkeley-algorithm-implementation).
 
+## 2.2 Multicast ordering
 For multicast, we care about the order issue. There arre 3 types multicast ordering approaches:
 - **FIFO ordering**: If a correct process issues (sends) multicast(g,m) to group g and then multicast(g,m’), then every correct  process that receives m’ would already have received m
 - **Causal ordering**: If multicast(g,m) -> multicast(g,m’)  then any correct process that delivers m’would already have delivered m. (is Lamport’s happens-before)
 - **Total ordering**: If a correct process P delivers message m before m’ (independent of the senders), then any other correct process P’ that receives m’ would already have received m.
 
+## 2.3 Updateing rules of FIFO, Causal and Total ordering
+
+![](img/fifo_update.png)
+
+![](img/causal_update.png)
+
+
+![](img/total_order_update.png)
+
+
+Examples of FIFO,  Causal and Total ordering refer to [Prof. Banerjee's slides]().
 
 
 # 3. Assignment step details 
 
 ## 3.1 Steps for assignment 2 - Multicast programming
 
-Before we dive into multicast ordering, we need to implement multicast programming using socket. It is different than the basic socket peer-to-peer programming like we did in [proj1 a server-clients structure system](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) where each client has a connection with the server. Section 4.1 explains the difference from coding perspective.
+Before we dive into multicast ordering, we need to implement multicast programming using socket. It is different than the basic socket peer-to-peer programming like we did in [proj1 a server-clients structure bank accounts mng system](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) where each client has a connection with the server, similar as [proj2-assign1-berkeley (Phase 1)](https://github.com/DayuanTan/berkeley-algorithm-implementation). Section 4.1 explains the difference from coding perspective.
 
 ## 3.2 Steps for assignment 2 - Multicast ordering
 
@@ -45,24 +58,21 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 2. Use vector clocks for clock synchronization and a vector of pre-sender sequence number data structure for message ordering. 
 3. Use different updating rules for delivering and buffering, for FIFO and Causal respectively (see below figure).
 
-![](img/fifo_update.png)
-![](img/causal_update.png)
+
 
 - For Total ordering:
 1. Select one process as sequencer (leader) arbitrarily. Use sequencer-based approach (see below figure).
 
-![](img/total_order_update.png)
-
 # 4. Implementation Explanation
 
-1. Firstly I Implemented multicast programming for 1 sender and multiple receivers using sender.cpp and receiver.cpp files.
-2. Secondly I merged them into one process with 2 threads. One for sending messages while another one for continuously receiving messages from multicast group. This is required in assignment 2.
-3. Thridly I implemented caucal ordering.
+1. Firstly I Implemented multicast programming for 1 sender and multiple receivers using sender.cpp and receiver.cpp files. -- Phase 2.0
+2. Secondly I merged them into one process with 2 threads. One for sending messages while another one for continuously receiving messages from multicast group. This is required in assignment 2. -- Phase 2.1
+3. Thridly I implemented FIFO ordering, causal ordering and total ordering. -- Phase 3.
 
 
-# 4.1 Multicast programming
+# 4.1 Multicast programming (Phase 2.0)
 
-First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir). It is little different than [server-client socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization).
+First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir). It is little different than [server-client (p2p) socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization).
 
 ![](img/multicast_structure.png)
 
@@ -348,11 +358,15 @@ References:
 4. Multicast Sockets - Programming Tips http://www.cs.unc.edu/~jeffay/dirt/FAQ/comp249-001-F99/mcast-socket.html
 
 
-# 4.2 Multicast programming using 2 threads
+# 4.2 Multicast programming using 2 threads (Phase 2.1)
 
-Cpp multi-thread refers to [here](https://www.geeksforgeeks.org/multithreading-in-cpp/).
 
-Code are in [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir. One thread for sending messages while another thread for continuously receiving messages from multicast group.
+
+Based on phase 2.0, I changed it to multicast programming using 2 threads which is required for this assignment. One thread for sending messages while another thread for continuously receiving messages from multicast group.
+
+Code are in [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir. 
+
+![](img/multicast_structure2.png)
 
 I implemented it in 2 ways. They both work well:
 
@@ -367,4 +381,9 @@ The below screenshot shows how I ran it:
 
 ![](img/multicast_hangon.png)
 
-# 4.3 Multicast ordering
+
+Reference:
+
+1. Cpp multi-thread https://www.geeksforgeeks.org/multithreading-in-cpp/.
+
+# 4.3 Multicast ordering (Phase 3)
