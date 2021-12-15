@@ -11,15 +11,17 @@ All tests are on Ubuntu 16.04 LTS, g++ (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20
 # 1. Assignment
 Implement the causal ordered multicasting for the distributed system. Create two threads for each process, one for sending the multicast message to other nodes and one for listening to its communication port. Use vector clocks to enforce the order of messages. Once a process delivers a received message to a user, it prints out the message on screen. You can assume that the number of processes (machines) is fixed (equal to or larger than 3) and processes will not fail, join, or leave the distributed system. Implement two versions of this program, one without causally ordered multicasting and one with this feature. Compare the results of the two programs.
 
+More assignment details: [PDF here](Project2_Fall2021.pdf).
+
 # 2. Background Knowledge Review
 
 
 ## 2.1 Broadcast, Multicast, Unicast
 
 The 3 types of communication forms in DS are listed below. In this project all are needed.
-- Broadcast, message sent to all processes (anywhere)
-- Multicast, message sent to a group of processes
-- Unicast, message sent from one sender process to one receiver process
+- Broadcast, message sent to all processes (anywhere).
+- Multicast, message sent to a group of processes. This will be introduced in section 4.1.
+- Unicast, message sent from one sender process to one receiver process. This has been done in [proj1](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) and [proj2-assign1](https://github.com/DayuanTan/berkeley-algorithm-implementation).
 
 For multicast, we care about the order issue. There arre 3 types multicast ordering approaches:
 - **FIFO ordering**: If a correct process issues (sends) multicast(g,m) to group g and then multicast(g,m’), then every correct  process that receives m’ would already have received m
@@ -30,8 +32,11 @@ For multicast, we care about the order issue. There arre 3 types multicast order
 
 # 3. Assignment step details 
 
+## 3.1 Steps for assignment 2 - Multicast programming
 
-## 3.1 Steps for assignment 2 - Multicast ordering
+Before we dive into multicast ordering, we need to implement multicast programming using socket. It is different than the basic socket peer-to-peer programming like we did in [proj1 a server-clients structure system](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) where each client has a connection with the server. Section 4.1 explains the difference from coding perspective.
+
+## 3.2 Steps for assignment 2 - Multicast ordering
 
 This part asks for implementing two of FIFO ordering, Causal ordering and Total ordering.
 
@@ -361,3 +366,5 @@ The below screenshot shows how I ran it:
 3. Then run ```./multicast_try2``` in second terminals. The 2nd terminal got 10 messages while the 1st terminal got 10 more messages (bc the receiver of 1st terminal didn't stop).
 
 ![](img/multicast_hangon.png)
+
+# 4.3 Multicast ordering
