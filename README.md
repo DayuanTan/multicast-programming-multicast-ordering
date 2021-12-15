@@ -1,4 +1,4 @@
-# multicast
+# Multicast Programming and Multicast Ordering Implementation
 
 Cpp implementation of multicast in distributed systems.
 
@@ -26,7 +26,7 @@ For multicast, we care about the order issue. There arre 3 types multicast order
 
 # 2. Assignment step details 
 
-
+Implement the causal ordered multicasting for the distributed system. Create two threads for each process, one for sending the multicast message to other nodes and one for listening to its communication port. Use vector clocks to enforce the order of messages. Once a process delivers a received message to a user, it prints out the message on screen. You can assume that the number of processes (machines) is fixed (equal to or larger than 3) and processes will not fail, join, or leave the distributed system. Implement two versions of this program, one without causally ordered multicasting and one with this feature. Compare the results of the two programs.
 
 
 ## 2.1 Steps for assignment 2 - Multicast ordering
