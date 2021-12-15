@@ -52,7 +52,9 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 
 # 4.1 Multicast programming
 
-First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir.). It is little different than [server-client socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization).
+First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir). It is little different than [server-client socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization).
+
+![](img/multicast_structure.png)
 
 Note: In below blocks, each block will have 3 lines of code, they all will follow this order and color style:
 ```diff
