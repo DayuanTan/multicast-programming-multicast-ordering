@@ -50,6 +50,11 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 
 # 4. Implementation Explanation
 
+1. Firstly I Implemented multicast programming for 1 sender and multiple receivers using sender.cpp and receiver.cpp files.
+2. Secondly I merged them into one process with 2 threads (send and receive for each). This is required in assignment 2.
+3. Thridly I implemented caucal ordering.
+
+
 # 4.1 Multicast programming
 
 First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir). It is little different than [server-client socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization).
@@ -294,7 +299,7 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
 
 ## 4.1.4 send/multicast
 
-Use sendto() for sending data.
+Use sendto() for sending data. send() works for connected sockets. sendto() works for either connected or unconnected sockets.
 
 ```cpp
 // // sending a message to client/multicast
@@ -308,7 +313,11 @@ if(sendto(sender_socket_fd, msg, strlen(msg), 0, (struct sockaddr*)&groupSock, s
 }
 ```
 
+
 ## 4.1.5 receive
+
+read() can handle file or socket. If the fd is a socket, read() is equivalent to recv() with no flags set. The recv() call applies only to connected sockets. The recvfrom() function applies to any datagram socket, whether connected or unconnected.
+
 ```cpp
 // receiving form multicast
 if (read(receiver_socket_fd , receiver_read_buffer, 1024) < 0){
@@ -322,7 +331,7 @@ The below screenshot shows how I ran it with 1 sender 3 receiverrs.
 1. Run ```make```.
 2. Run ```./receiver``` in multiple terminals. 
 3. Then run ```./sender``` in multiple ternimals. 
-4. 
+
 (This implementation only receives one message you can modify it to receive multiple messages easily.)
 
 ![](img/multicast_run.png)
@@ -332,3 +341,18 @@ References:
 2. *IPPROTO_IP level* options/flags https://tldp.org/HOWTO/Multicast-HOWTO-6.html
 3. Oracle Using Multicast - send, receive IPv4 Multicast Datagrams https://docs.oracle.com/cd/E23824_01/html/821-1602/sockets-137.html
 4. Multicast Sockets - Programming Tips http://www.cs.unc.edu/~jeffay/dirt/FAQ/comp249-001-F99/mcast-socket.html
+
+
+# 4.2 Multicast programming using 2 threads
+
+Cpp multi-thread refers to [here](https://www.geeksforgeeks.org/multithreading-in-cpp/).
+
+Code are in [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir.
+
+I implemented it in multiple ways. Note the difference between them:
+
+- In try1 version I used **same** socket_fd for sender and receiver threads. Receiver receives multiple messages.
+- In try2 version I used **different** socket_fd for sender and receiver threads. In this version sender() and receiver() function are identical to sender.cpp and receiver.cpp in 4.1 section. Receiver receives only 1 messages.
+- The try3 version is an extension of try1 version and make the receiver in a loop to receive multiple messages. **This is the base for next phase**.
+
+![](img/multicast_hangon.png)
