@@ -398,6 +398,56 @@ Reference:
 
 # 4.3 Multicast ordering (Phase 3)
 
+The codes in this section is based on above [p2.1_multicast_programming_2threads/multicast_twothreads_try1_same_multicast_socket_fd.cpp](p2.1_multicast_programming_2threads/multicast_twothreads_try1_same_multicast_socket_fd.cpp). 
+
+## 4.3.1 Processes amount and counter
+The assignment has clarified that "You can assume that the number of processes (machines) is fixed (equal to or larger than 3) and processes will not fail, join, or leave the distributed system." 
+
+So I used helper funtions. 
+
+A file "processes_amount_declared.txt" is used to store user's declaration about how many processes they will create and user must follow this number they declared. User will be ask once only when the first process is created.
+
+A file "processes_counter.txt" is used to count how many processes/nodes we have in this DS. When you open a terminal and run ```./causal_ordering``` it will increase by 1. When you Ctrl+c to terminate a process it will decrease by 1. If you close terminal windows directly it cannot decrease it, but when next time you run this program and when ask for user input declared processes amount (this happens at very early phase) it will overwrite it to 0 before other any operations.
+
+All below operations will be done on top of the condition that 
+```cpp
+the processes counter nummber == the declared processes amount
+```
+
+## 4.3.2 vector clocks data structure
+
+```cpp
+vector<int> vector_clocks;
+```
+
+Each process will maintain their own vector_clocks. Their own index is the No. of their own process inside all processes. For example, the firstly created process will have process No. 1 and vector_clocks[0] represents itself. Similarly the secondly created process will have process No. 2 and vector_clocks[1] represents itself.
+
+More examples: (Assuming there are 3 processes/nodes totally. Each of them has their own variable ```vector_clocks``` in their process.)
+
+The variable ```vector_clocks```  in process/node No. 1 stores vector clocks like this:
+```
+{Node1's local clock, Node1's knowledge of Node2's clock, Node1's knowledge of Node3's clock}
+```
+
+The variable ```vector_clocks```  in process/node No. 2 stores vector clocks like this:
+```
+{Node2's knowledge of Node1's clock, Node2's local clock, Node2's knowledge of Node3's clock}
+```
+
+The variable ```vector_clocks```  in process/node No. 3 stores vector clocks like this:
+```
+{Node3's knowledge of Node1's clock, Node3's knowledge of Node2's clock, Node3's local clock}
+```
+
+Every time before sending a message, or after receiving a message, each process(node) will increase its local clock by one.
+
+Every time after receiving a message, each process(node) will modify its knowledge of other process(node)'s clokc according to the message it received.
+
+
 Implement vector clocks data structure
 define message content
 send message
+
+Reference:
+1. catch a Ctrl+C event in C++ https://www.tutorialspoint.com/how-do-i-catch-a-ctrlplusc-event-in-cplusplus
+2. cpp pass vector reference to thread https://stackoverflow.com/a/23268182/9593219
