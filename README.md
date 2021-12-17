@@ -40,7 +40,14 @@ For multicast, we care about the order issue. There arre 3 types multicast order
 ![](img/total_order_update.png)
 
 
-Examples of FIFO,  Causal and Total ordering refer to [Prof. Banerjee's slides](slides).
+Examples of FIFO,  Causal and Total ordering refer to [Prof. Banerjee's slides](slides) and [here](https://courses.engr.illinois.edu/cs425/fa2020/L16.FA20.pdf).
+
+## 2.4 Message structure
+
+It is worth to highlight that the message data structure of three multicast ordering algorithms are different.
+- **FIFO ordering**: each process(node) multicast its own local clock (sequence number) to all 
+- **Causal ordering**: each process(node) multicast the vector clocks which includes all process(node)'s clocks array (sequence numbers array) to all
+- **Total ordering**: the multicast messages from sequencer to all contain the global sequence number
 
 
 # 3. Assignment step details 
@@ -56,12 +63,12 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 - For FIFO ordering and Causal ordering:
 1. Implement at least 3 process. Each has 2 threads, one for sending messages while another for receiving messages.
 2. Use vector clocks for clock synchronization and a vector of pre-sender sequence number data structure for message ordering. 
-3. Use different updating rules for delivering and buffering, for FIFO and Causal respectively (see below figure).
+3. Use different updating rules for delivering and buffering, for FIFO and Causal respectively (see section 2.3 updating rules).
 
 
 
 - For Total ordering:
-1. Select one process as sequencer (leader) arbitrarily. Use sequencer-based approach (see below figure).
+1. Select one process as sequencer (leader) arbitrarily. Use sequencer-based approach (see section 2.3 updating rules).
 
 # 4. Implementation Explanation
 
@@ -439,9 +446,39 @@ The variable ```vector_clocks```  in process/node No. 3 stores vector clocks lik
 {Node3's knowledge of Node1's clock, Node3's knowledge of Node2's clock, Node3's local clock}
 ```
 
-Every time before sending a message, or after receiving a message, each process(node) will increase its local clock by one.
 
-Every time after receiving a message, each process(node) will modify its knowledge of other process(node)'s clokc according to the message it received.
+
+## 4.3.3 No ordering (Phase 3.0)
+
+Every time before sending a message, each process(node) will increase its own local clock by one.
+
+Every time after receiving a message, each process(node) will modify its knowledge of **other** process(node)'s clock according to the message it received. It doesn't modify its own clock according to received message (no need to). It only update if recevied clock is larger than local knowledge of that clock in no ordering version (different ordering algorithms have different updating rules which are implemented in Section 4.3.4 - 4.3.5).
+
+
+The file [p3.0_multicast_ordering/multicast_without_ordering.cpp](p3.0_multicast_ordering/multicast_without_ordering.cpp) implemented the version without any ordering. All below versions containing different ordering algorithms are modified based on it. Helper functions will be share-used among different versions.
+
+
+## 4.3.4 FIFO ordering (Phase 3.1)
+
+The file [p3.1_multicast_ordering/multicast_fifo_ordering.cpp](p3.1_multicast_ordering/multicast_fifo_ordering.cpp) implemented the version of FIFO ordering.
+
+
+### Message Structure
+
+- Sending
+    
+    The messages each process(node) multicast to all processes(nodes) include its own clock (sequence number) and its own process No. value. 
+
+    For example "I'm process No. 2 and my local clock is 5."
+
+- Receiving
+    
+    After receiving the multicast message, the process(node) update/buffer its knowledge of the clock of that process. As the above example, it will updated/buffered its knowledge of clock of process No. 2 to 5.
+
+
+
+## 4.3.5 Causal ordering 
+
 
 
 Implement vector clocks data structure
@@ -451,3 +488,4 @@ send message
 Reference:
 1. catch a Ctrl+C event in C++ https://www.tutorialspoint.com/how-do-i-catch-a-ctrlplusc-event-in-cplusplus
 2. cpp pass vector reference to thread https://stackoverflow.com/a/23268182/9593219
+3. Convert character array to string in C++ https://www.geeksforgeeks.org/convert-character-array-to-string-in-c/
