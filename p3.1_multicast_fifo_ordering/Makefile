@@ -9,4 +9,4 @@ fifo_ordering:
 #	g++ multicast_causal_ordering.cpp helper.cpp -o causal_ordering -std=c++11 -pthread 
 
 clean:
-	rm causal_ordering  fifo_ordering
+	rm   fifo_ordering

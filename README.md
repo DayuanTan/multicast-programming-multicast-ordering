@@ -493,13 +493,10 @@ Each time a msg is delivered, we need to check the buffered_msgs to see which me
 Causal ordering also have these two.
 
 
-## 4.3.5 Causal ordering 
+## 4.3.5 Causal ordering (Phase 3.2)
 
 
 
-Implement vector clocks data structure
-define message content
-send message
 
 Reference:
 1. catch a Ctrl+C event in C++ https://www.tutorialspoint.com/how-do-i-catch-a-ctrlplusc-event-in-cplusplus

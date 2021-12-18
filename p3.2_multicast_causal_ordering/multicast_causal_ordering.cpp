@@ -76,7 +76,7 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
     }
 
 
-    for(int i = 0; i < 2; i++){
+    for(int i = 0; i < 10; i++){
         // increaes self clock by 1 before sending
         vector_clocks.at(curr_proc_no-1) ++;
 
@@ -175,9 +175,14 @@ void receiver(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc
                 
                 // check buffered msg which meet requirement
                 check_buffered_msgs_and_deliver(recv_proc_no, recv_clock_value, vector_clocks);
+
+                cout << "Vector_clocks updated: ";
+                print_vecotr_clocks(vector_clocks);
             }else{
                 // buffer msg
                 buffer_msg(recv_proc_no, recv_clock_value, received_msg_str);
+                cout << "Vector_clocks didn't update: ";
+                print_vecotr_clocks(vector_clocks);
             }
 
             
@@ -185,8 +190,7 @@ void receiver(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc
             perror("Receiver: vector_clocks size of received message is not enough.");
             exit(EXIT_FAILURE);
         }
-        cout << "Vector_clocks updated: ";
-        print_vecotr_clocks(vector_clocks);
+        
 
         memset(receiver_read_buffer, '\0', strlen(receiver_read_buffer));
     }
@@ -245,7 +249,7 @@ int main(int argc, char *argv[])
 
 
     // *******
-    // FIFO ordering begin
+    // Causal ordering begin
     // *******
 
     // ask user input (also clean processes_counter if this is first created proc)
@@ -280,7 +284,7 @@ int main(int argc, char *argv[])
 
 
     // *******
-    // FIFO ordering end
+    // Causal ordering end
     // *******
 
 
