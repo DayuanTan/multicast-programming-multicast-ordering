@@ -17,6 +17,9 @@
 
 // not place a "using namespace std" directive in the C++ header file because it may cause silent name clashes between different libraries. To remedy this, use the fully qualified name:  std::string
 
+// global
+extern std::vector<int> vector_clocks; // vector clocks of knowledge of all processess/nodes
+
 
 const char PROCESSES_COUNTER_FILE_NAME[] = "processes_counter.txt"; 
 

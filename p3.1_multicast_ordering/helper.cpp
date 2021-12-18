@@ -4,6 +4,11 @@
 using namespace std;
 
 
+// global
+std::vector<int> vector_clocks; // vector clocks of knowledge of all processess/nodes
+
+
+
 // operation arguemnt: 0 - fetech curr proc count; 1 increase counter by 1; -1 decrease counter by 1
 int processes_counter(int operation){
     int proc_ctr_current_value; 
@@ -163,6 +168,20 @@ vector<string> split(string s, string delimiter) {
     return res;
 }
 
+void clean_proc_ctr(){
+    // clean the processes counter value
+    ofstream proc_ctr_file_modify;
+    proc_ctr_file_modify.open(PROCESSES_COUNTER_FILE_NAME, ios::trunc); // ios::trunc: previous content is deleted
+    if (proc_ctr_file_modify.is_open()){
+        // write into 
+        proc_ctr_file_modify << 0;
+        proc_ctr_file_modify.close();
+    } else {
+        cout << "Unable to open the '" << PROCESSES_COUNTER_FILE_NAME << "' file, please check the name!\n"; 
+        exit(-1);
+    }
+}
+
 
 // Define the function to be called when ctrl-c (SIGINT) is sent to process
 void signal_callback_handler(int signum) {
@@ -170,8 +189,9 @@ void signal_callback_handler(int signum) {
 
     int proc_ctr_current_value = processes_counter(-1);  // decrease counter by 1
     declare_processes_amount(0); // clean the declared proc amount
+    clean_proc_ctr(); // clean the proc ctr
     printf("Multicast: process stopped. \n");
-    cout << "There are still " << proc_ctr_current_value << " processes/nodes left in this DS now." << endl;
+    cout << "There are still " << processes_counter(0) << " processes/nodes left in " << PROCESSES_COUNTER_FILE_NAME << " now." << endl;
 
 
     // Terminate program

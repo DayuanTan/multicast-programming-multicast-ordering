@@ -486,7 +486,9 @@ vector<vector<s_Seq_Msg>> buffered_msgs;
 vector<vector<s_Seq_Msg>> delivered_msgs;
 ```
 
-Each process(node) will maintain this two two-layers vectors. If the received message clock(sequence number) meet the requirement then deliver it directly. Otherwise buffer them.
+Each process(node) will maintain these two two-layers vectors. If the received message clock(sequence number) meet the requirement then deliver it directly. Otherwise buffer them.
+
+Each time a msg is delivered, we need to check the buffered_msgs to see which meet the new clock(sequence) requirement and deliver it. Function ```check_buffered_msgs_and_deliver()``` will do this.
 
 Causal ordering also have these two.
 

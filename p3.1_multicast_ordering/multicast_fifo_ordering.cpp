@@ -21,9 +21,14 @@
 
 using namespace std;
 
+
+// global variables
+
 //NOTE: diff machine diff WIFI give you diff local ip addr. Use 'ifconfig' to check
 const char LOCAL_IP_ADDR[] = "192.168.169.156";
 //const cahr LOCAL_IP_ADDR[] = "192.168.169.154";
+
+
 
 
 // argument vector<int>& pass vector by reference
@@ -71,7 +76,7 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
     }
 
 
-    for(int i = 0; i < 5; i++){
+    for(int i = 0; i < 2; i++){
         // increaes self clock by 1 before sending
         vector_clocks.at(curr_proc_no-1) ++;
 
@@ -88,6 +93,9 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
             perror("Sender: Sending datagram message error");
             exit(EXIT_FAILURE);
         }
+
+        cout << "------\nMessge sent, so vector_clocks updated: "; 
+        print_vecotr_clocks(vector_clocks);
         usleep( 2 * 1000000 ); //microseconds 10^6 = 1 second
     }
 }
@@ -148,24 +156,31 @@ void receiver(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc
         string received_msg_str = receiver_read_buffer;
         vector<string> splited = split( received_msg_str, ",");
         cout << "Splited result is : " << vectorstr2str(splited) << endl;
-        if (splited.size() >= 2){ // bc for FIFO only first 2 are essential
-            int recv_clock_value = stoi(splited[0]);// aka sequence no
-            int recv_proc_no = stoi(splited[1]);
+        int recv_clock_value = stoi(splited[0]);// aka sequence no
+        int recv_proc_no = stoi(splited[1]);
 
-            if (vector_clocks.at(recv_proc_no) + 1 == recv_clock_value){
+        // no action if the msg come from self
+        if (recv_proc_no == curr_proc_no){
+            cout << "\nMessage came from self, no action needed.\n\n";
+            continue;
+        }
+
+
+        if (splited.size() >= 2){ // bc for FIFO only first 2 are essential
+
+            if (int(vector_clocks.at(recv_proc_no-1) + 1) == recv_clock_value){
                 // deliver msg
+                deliver_msg(recv_proc_no, recv_clock_value, received_msg_str);
+                vector_clocks.at(recv_proc_no-1) = recv_clock_value; 
+                
+                // check buffered msg which meet requirement
+                check_buffered_msgs_and_deliver(recv_proc_no, recv_clock_value, vector_clocks);
             }else{
                 // buffer msg
+                buffer_msg(recv_proc_no, recv_clock_value, received_msg_str);
             }
 
-            for (int i = 0; i < vector_clocks.size(); i++) {
-                if (i == curr_proc_no-1){
-                    continue;
-                }
-                if (vector_clocks.at(i) < stoi(splited.at(i)) ){ // max(local clock, received clock)
-                    vector_clocks.at(i) = stoi(splited.at(i));
-                }
-            }
+            
         }else{
             perror("Receiver: vector_clocks size of received message is not enough.");
             exit(EXIT_FAILURE);
@@ -255,10 +270,12 @@ int main(int argc, char *argv[])
     }
 
 
-    int curr_proc_no = proc_ctr_current_value; // the no. of current process in all processes, e.g. it is 3 for third process.
-    vector<int> vector_clocks; // vector clocks of all processess/nodes
+    int curr_proc_no = proc_ctr_current_value; // the no. of current process in all processes, e.g. it is 3 for third process. 
+    cout << "Current process(node) is No. " << curr_proc_no << endl << endl;
     for (int i =0; i < declared_proc_amount; i++){
         vector_clocks.push_back(0);
+        buffered_msgs.push_back(vector<s_Seq_Msg>());
+        delivered_msgs.push_back(vector<s_Seq_Msg>());
     }
 
 
