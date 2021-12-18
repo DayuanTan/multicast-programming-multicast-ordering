@@ -15,10 +15,15 @@
 #include <bits/stdc++.h>
 
 #include "helper.h"  
+#include "buffered_delivered_msg.h"
 
 #define PORT 5555
 
 using namespace std;
+
+//NOTE: diff machine diff WIFI give you diff local ip addr. Use 'ifconfig' to check
+const char LOCAL_IP_ADDR[] = "192.168.169.156";
+//const cahr LOCAL_IP_ADDR[] = "192.168.169.154";
 
 
 // argument vector<int>& pass vector by reference
@@ -58,7 +63,7 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
     /* Set local interface for outbound multicast datagrams. */
     /* The IP address specified must be associated with a local multicast capable interface. */
     struct in_addr localInterface;
-    localInterface.s_addr = inet_addr("192.168.169.154"); // On linux use ifconfig to check "UP ... MULTICAST"
+    localInterface.s_addr = inet_addr(LOCAL_IP_ADDR); // On linux use ifconfig to check "UP ... MULTICAST"
     if(setsockopt(multicast_socket_fd, IPPROTO_IP, IP_MULTICAST_IF, (char *)&localInterface, sizeof(localInterface)) < 0)
     {
         perror("Sender: setsockopt IPPROTO_IP IP_MULTICAST_IF");
@@ -66,7 +71,7 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
     }
 
 
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 5; i++){
         // increaes self clock by 1 before sending
         vector_clocks.at(curr_proc_no-1) ++;
 
@@ -74,7 +79,8 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
         // const char *msg = "Hello from sender, anyone in this group should recerve this.";
         // sendto(client_sockets[i] , msg , strlen(msg) , 0 );
         /* Send a message to the multicast group specified by the group_address sockaddr-structure. */ 
-        string msg_str = vectorint2str(vector_clocks) + ", are the vector_clock elements. Msg No.=" + to_string(i) + ". From sender (ProcessNode No.= " + to_string(curr_proc_no) + " pid " + to_string(getpid()) + " threadid " + curr_threadID_str + "), anyone in this group should recerve this.";
+        // FIFO: the number before first 2 "," are essential  
+        string msg_str = to_string(vector_clocks.at(curr_proc_no-1)) + ", " + to_string(curr_proc_no) + ", are my local clock value and my proc_no. Msg No.=" + to_string(i) + ". From sender (ProcessNode No.= " + to_string(curr_proc_no) + " pid " + to_string(getpid()) + " threadid " + curr_threadID_str + "), anyone in this group should recerve this.";
         char msg_char_array[msg_str.length() + 1];
         strcpy(msg_char_array, msg_str.c_str());
         if(sendto(multicast_socket_fd, &msg_char_array, strlen(msg_char_array), 0, (struct sockaddr*)&group_address, sizeof(group_address)) < 0)
@@ -82,7 +88,7 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
             perror("Sender: Sending datagram message error");
             exit(EXIT_FAILURE);
         }
-        usleep( 1 * 1000000 ); //microseconds 10^6 = 1 second
+        usleep( 2 * 1000000 ); //microseconds 10^6 = 1 second
     }
 }
 
@@ -111,13 +117,13 @@ void receiver(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc
     } 
     
 
-    /* Join the multicast group 226.1.1.1 on the local interface 192.168.169.154 interface. */
+    /* Join the multicast group 226.1.1.1 on the local interface LOCAL_IP_ADDR interface. */
     /* Note that this IP_ADD_MEMBERSHIP option must be */
     /* called for each local interface over which the multicast */
     /* datagrams are to be received. */
     struct ip_mreq group;
     group.imr_multiaddr.s_addr = inet_addr("226.1.1.1");
-    group.imr_interface.s_addr = inet_addr("192.168.169.154");
+    group.imr_interface.s_addr = inet_addr(LOCAL_IP_ADDR);
     if (setsockopt(multicast_socket_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&group, sizeof(group)) < 0)
     {
         perror("Receiver: Adding multicast group error");
@@ -142,7 +148,16 @@ void receiver(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc
         string received_msg_str = receiver_read_buffer;
         vector<string> splited = split( received_msg_str, ",");
         cout << "Splited result is : " << vectorstr2str(splited) << endl;
-        if (splited.size() >= processes_counter(0)){
+        if (splited.size() >= 2){ // bc for FIFO only first 2 are essential
+            int recv_clock_value = stoi(splited[0]);// aka sequence no
+            int recv_proc_no = stoi(splited[1]);
+
+            if (vector_clocks.at(recv_proc_no) + 1 == recv_clock_value){
+                // deliver msg
+            }else{
+                // buffer msg
+            }
+
             for (int i = 0; i < vector_clocks.size(); i++) {
                 if (i == curr_proc_no-1){
                     continue;
@@ -215,7 +230,7 @@ int main(int argc, char *argv[])
 
 
     // *******
-    // Causal ordering begin
+    // FIFO ordering begin
     // *******
 
     // ask user input (also clean processes_counter if this is first created proc)
@@ -241,14 +256,14 @@ int main(int argc, char *argv[])
 
 
     int curr_proc_no = proc_ctr_current_value; // the no. of current process in all processes, e.g. it is 3 for third process.
-    vector<int> vector_clocks;
+    vector<int> vector_clocks; // vector clocks of all processess/nodes
     for (int i =0; i < declared_proc_amount; i++){
         vector_clocks.push_back(0);
     }
 
 
     // *******
-    // Causal ordering end
+    // FIFO ordering end
     // *******
 
 

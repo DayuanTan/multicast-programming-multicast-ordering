@@ -1,6 +1,8 @@
 
 #include "helper.h"  
 
+using namespace std;
+
 
 // operation arguemnt: 0 - fetech curr proc count; 1 increase counter by 1; -1 decrease counter by 1
 int processes_counter(int operation){

@@ -14,7 +14,8 @@
 #include <bits/stdc++.h>
 #include <sstream>
 
-using namespace std;
+
+// not place a "using namespace std" directive in the C++ header file because it may cause silent name clashes between different libraries. To remedy this, use the fully qualified name:  std::string
 
 
 const char PROCESSES_COUNTER_FILE_NAME[] = "processes_counter.txt"; 
@@ -30,13 +31,13 @@ int fetch_processes_declared_amount();
 
 int ask_user_input_declared_proc_amt();
 
-string vectorint2str(vector<int>& vc);
+std::string vectorint2str(std::vector<int>& vc);
 
-string vectorstr2str(vector<string>& vc);
+std::string vectorstr2str(std::vector<std::string>& vc);
 
-void print_vecotr_clocks(vector<int>& vc);
+void print_vecotr_clocks(std::vector<int>& vc);
 
-vector<string> split(string s, string delimiter); 
+std::vector<std::string> split(std::string s, std::string delimiter); 
 
 void signal_callback_handler(int signum);
 

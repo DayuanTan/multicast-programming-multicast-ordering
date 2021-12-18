@@ -475,6 +475,20 @@ The file [p3.1_multicast_ordering/multicast_fifo_ordering.cpp](p3.1_multicast_or
     
     After receiving the multicast message, the process(node) update/buffer its knowledge of the clock of that process. As the above example, it will updated/buffered its knowledge of clock of process No. 2 to 5.
 
+### Buffered Messages, Delivered Messages
+
+```cpp
+// All buffered msgs. Index of out layer vector is proc_no-1. The order of inner vector is received order.
+vector<vector<s_Seq_Msg>> buffered_msgs;
+
+
+// All delivered msgs. Index of out layer vector is proc_no-1. The order of inner vector is delivered order.
+vector<vector<s_Seq_Msg>> delivered_msgs;
+```
+
+Each process(node) will maintain this two two-layers vectors. If the received message clock(sequence number) meet the requirement then deliver it directly. Otherwise buffer them.
+
+Causal ordering also have these two.
 
 
 ## 4.3.5 Causal ordering 

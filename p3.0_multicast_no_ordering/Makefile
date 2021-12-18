@@ -6,4 +6,4 @@ no_ordering:
 
 
 clean:
-	rm  no_ordering
+	rm   no_ordering
