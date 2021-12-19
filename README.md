@@ -2,7 +2,7 @@
 
 Firstly I implemented the multicast cpp implementation in distributed systems. Code are in [p2_multicast_programming](p2_multicast_programming) dir, and [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir. The latter one uses one process with 2 threads. One for sending messages while another one for continuously receiving messages from multicast group. 
 
-Secondly, based on that, I implemented multicast ordering for DS, including FIFO ordering, causal ordering and total ordering.
+Secondly, based on that, I implemented multicast ordering for DS, including [FIFO ordering](p3.1_multicast_fifo_ordering) and [causal ordering](p3.2_multicast_causal_ordering).
 
 ## Environments:
 
