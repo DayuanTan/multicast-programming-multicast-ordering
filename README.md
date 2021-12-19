@@ -460,7 +460,7 @@ The file [p3.0_multicast_ordering/multicast_without_ordering.cpp](p3.0_multicast
 
 ## 4.3.4 FIFO ordering (Phase 3.1)
 
-The file [p3.1_multicast_ordering/multicast_fifo_ordering.cpp](p3.1_multicast_ordering/multicast_fifo_ordering.cpp) implemented the version of FIFO ordering.
+The file [p3.1_multicast_fifo_ordering/multicast_fifo_ordering.cpp](p3.1_multicast_fifo_ordering/multicast_fifo_ordering.cpp) implemented the version of FIFO ordering.
 
 
 ### Message Structure
@@ -495,6 +495,25 @@ Causal ordering also have these two.
 
 ## 4.3.5 Causal ordering (Phase 3.2)
 
+
+The file [p3.2_multicast_causal_ordering/multicast_causal_ordering.cpp](p3.2_multicast_causal_ordering/multicast_causal_ordering.cpp) implemented the version of Causal ordering.
+
+
+### Message Structure
+
+- Sending
+    
+    Different to FIFO, the messages each process(node) multicast to all processes(nodes) include its whole clocks vector (sequence numbers vector), which is its local knowledge of all processes's clocks, and its own process No. value. 
+
+    For example "There are 3 processes totally. I'm process No. 2 and my clocks vector is {2, 5, 3}." In this example, the clock "5" is correct. The clocks "2" and "3" are just process no.2's knowledge of clock values of process no. 1 and no. 3, which might be wrong.
+
+- Receiving
+    
+    After receiving the multicast message, the process(node) update/buffer its knowledge of the clock of that process. As the above example, it will updated/buffered its knowledge of clock of process No. 2 to 5.
+
+    Same part as FIFO is it also only update one clock for each message. Different part is that the requirement is stricter.
+
+    On top of the first requirement which is same as FIFO's, the second requirement asks for checking the received all other (except received_process and current_process) processes's clock.
 
 
 

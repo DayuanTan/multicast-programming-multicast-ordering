@@ -75,8 +75,12 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
         exit(EXIT_FAILURE);
     }
 
+    usleep( 2 * 1000000 ); //microseconds 10^6 = 1 second
+    for(int i = 0; i < 4; i++){
+        if (curr_proc_no-1 != i){
+            continue; //skip some msg
+        }
 
-    for(int i = 0; i < 10; i++){
         // increaes self clock by 1 before sending
         vector_clocks.at(curr_proc_no-1) ++;
 
@@ -84,8 +88,8 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
         // const char *msg = "Hello from sender, anyone in this group should recerve this.";
         // sendto(client_sockets[i] , msg , strlen(msg) , 0 );
         /* Send a message to the multicast group specified by the group_address sockaddr-structure. */ 
-        // FIFO: the number before first 2 "," are essential  
-        string msg_str = to_string(vector_clocks.at(curr_proc_no-1)) + ", " + to_string(curr_proc_no) + ", are my local clock value and my proc_no. Msg No.=" + to_string(i) + ". From sender (ProcessNode No.= " + to_string(curr_proc_no) + " pid " + to_string(getpid()) + " threadid " + curr_threadID_str + "), anyone in this group should recerve this.";
+        // Causal: send whole vector_clocks  
+        string msg_str = vectorint2str(vector_clocks) + ", " + to_string(curr_proc_no) + ", are my whole clocks vector and my proc_no. Msg No.=" + to_string(i) + ". From sender (ProcessNode No.= " + to_string(curr_proc_no) + " pid " + to_string(getpid()) + " threadid " + curr_threadID_str + "), anyone in this group should recerve this.";
         char msg_char_array[msg_str.length() + 1];
         strcpy(msg_char_array, msg_str.c_str());
         if(sendto(multicast_socket_fd, &msg_char_array, strlen(msg_char_array), 0, (struct sockaddr*)&group_address, sizeof(group_address)) < 0)
@@ -138,7 +142,7 @@ void receiver(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc
         exit(EXIT_FAILURE);
     }
     
-
+    int declared_proc_amount = fetch_processes_declared_amount();
     char receiver_read_buffer[1024] = {0}; // compile will be slow if this is too large
     while(1){
         // receiving form multicast
@@ -156,31 +160,69 @@ void receiver(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc
         string received_msg_str = receiver_read_buffer;
         vector<string> splited = split( received_msg_str, ",");
         cout << "Splited result is : " << vectorstr2str(splited) << endl;
-        int recv_clock_value = stoi(splited[0]);// aka sequence no
-        int recv_proc_no = stoi(splited[1]);
+        cout << "Splited size is " << splited.size() << endl;
+        vector<int> recv_clocks_vector;
+        int recv_proc_no = 0;
+        if (splited.size() > declared_proc_amount+1 ){ // first declared_proc_amount elements are clocks vector
+            for (int  i = 0; i < declared_proc_amount; i++){
+                recv_clocks_vector.push_back( stoi(splited[i]) );// aka sequence no
+            }
+            recv_proc_no = stoi(splited[declared_proc_amount]);// the (declared_proc_amount+1)th element is 
+        }
+        if (recv_clocks_vector.size()!=declared_proc_amount){
+            perror("Receiver: recv_clocks_vector.size() error");
+            exit(EXIT_FAILURE);
+        }
+        if (recv_proc_no <= 0){
+            perror("Receiver: recv_proc_no error");
+            exit(EXIT_FAILURE);
+        }
+        
 
         // no action if the msg come from self
         if (recv_proc_no == curr_proc_no){
             cout << "\nMessage came from self, no action needed.\n\n";
+            print_vecotr_clocks(vector_clocks);
             continue;
         }
 
 
-        if (splited.size() >= 2){ // bc for FIFO only first 2 are essential
+        if (splited.size() > declared_proc_amount+1 ){ // bc for Causal only first declared_proc_amount+1 elementts are essential
 
-            if (int(vector_clocks.at(recv_proc_no-1) + 1) == recv_clock_value){
+            bool meet_requirements = false;
+            if (int(vector_clocks.at(recv_proc_no-1) + 1) == recv_clocks_vector.at(recv_proc_no-1)){// requirement1
+                // requirement2: check all other processes's clock
+                for (int i = 0; i < declared_proc_amount; i ++){
+                    if (i == curr_proc_no-1 || i == recv_proc_no-1){
+                        continue;// skip self, only check others
+                    }
+                    // requirement: local clock vector [i] >= received clock vector [i]
+                    if (vector_clocks.at(i) >= recv_clocks_vector.at(i) ){
+                        meet_requirements = true;
+                    }else{
+                        meet_requirements = false;
+                        break;
+                    }
+                }
+            }
+
+            if (meet_requirements){
                 // deliver msg
-                deliver_msg(recv_proc_no, recv_clock_value, received_msg_str);
-                vector_clocks.at(recv_proc_no-1) = recv_clock_value; 
-                
-                // check buffered msg which meet requirement
-                check_buffered_msgs_and_deliver(recv_proc_no, recv_clock_value, vector_clocks);
-
+                deliver_msg(recv_proc_no, recv_clocks_vector.at(recv_proc_no-1), received_msg_str);
+                // update Vector_clocks
+                vector_clocks.at(recv_proc_no-1) = recv_clocks_vector.at(recv_proc_no-1); 
                 cout << "Vector_clocks updated: ";
                 print_vecotr_clocks(vector_clocks);
+                
+                // check buffered msg which meet requirement
+                if (check_buffered_msgs_and_deliver(curr_proc_no, recv_proc_no, recv_clocks_vector.at(recv_proc_no-1), vector_clocks) > 0){
+                    cout << "Vector_clocks updated from buffered msgs: ";
+                    print_vecotr_clocks(vector_clocks);
+                }
+                
             }else{
                 // buffer msg
-                buffer_msg(recv_proc_no, recv_clock_value, received_msg_str);
+                buffer_msg(recv_proc_no, recv_clocks_vector.at(recv_proc_no-1), received_msg_str);
                 cout << "Vector_clocks didn't update: ";
                 print_vecotr_clocks(vector_clocks);
             }

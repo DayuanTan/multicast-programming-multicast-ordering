@@ -1,4 +1,5 @@
 #include "buffered_delivered_msg.h"
+#include "helper.h"
 
 using namespace std;
 
@@ -13,10 +14,13 @@ std::vector<std::vector<s_Seq_Msg>> delivered_msgs;
 
 
 
-void print_buffered_msgs(int proc_no){
+void print_buffered_msgs(){
+    int proc_declared_amount = fetch_processes_declared_amount();
     cout << "\n All buffered msgs are:\n";
-    for (int i = 0; i < buffered_msgs.at(proc_no-1).size(); i++){
-        cout << buffered_msgs.at(proc_no-1).at(i).msg << endl;
+    for (int proc_i = 0; proc_i < proc_declared_amount; proc_i++){
+        for (int i = 0; i < buffered_msgs.at(proc_i).size(); i++){
+            cout << buffered_msgs.at(proc_i).at(i).msg << endl;
+        }
     }
     cout << endl << endl << endl;
 }
@@ -28,13 +32,16 @@ void buffer_msg(int proc_no, int sequence_no, string msg){
     buffered_msgs.at(proc_no-1).push_back(new_msg);
 
     cout << "\nMessage buffered!\n";
-    print_buffered_msgs(proc_no);
+    print_buffered_msgs();
 }
 
-void print_delivered_msgs(int proc_no){
+void print_delivered_msgs(){
+    int proc_declared_amount = fetch_processes_declared_amount();
     cout << "\n All delivered msgs are:\n";
-    for (int i = 0; i < delivered_msgs.at(proc_no-1).size(); i++){
-        cout << delivered_msgs.at(proc_no-1).at(i).msg << endl;
+    for (int proc_i = 0; proc_i < proc_declared_amount; proc_i++){
+        for (int i = 0; i < delivered_msgs.at(proc_i).size(); i++){
+            cout << delivered_msgs.at(proc_i).at(i).msg << endl;
+        }
     }
     cout << endl << endl << endl;
 }
@@ -46,7 +53,7 @@ void deliver_msg(int proc_no, int sequence_no, string msg){
     delivered_msgs.at(proc_no-1).push_back(new_msg);
 
     cout << "\nMessage delivered!\n";
-    print_delivered_msgs(proc_no);
+    print_delivered_msgs();
 }
 
 void check_buffered_msgs_and_deliver(int proc_no, int new_curr_clock_value, vector<int> & vector_clocks){
@@ -72,6 +79,6 @@ void check_buffered_msgs_and_deliver(int proc_no, int new_curr_clock_value, vect
         buffered_msgs.at(proc_no-1).erase( buffered_msgs.at(proc_no-1).begin() + delivered_msg_index.top() );
         delivered_msg_index.pop(); //delete toppest element 
     }
-    print_buffered_msgs(proc_no);
+    print_buffered_msgs();
     
 }

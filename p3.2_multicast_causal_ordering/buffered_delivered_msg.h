@@ -38,14 +38,14 @@ extern std::vector<std::vector<s_Seq_Msg>> delivered_msgs;
 
 
 
-void print_buffered_msgs(int proc_no);
+void print_buffered_msgs();
 
 void buffer_msg(int proc_no, int sequence_no, std::string msg);
 
-void print_delivered_msgs(int proc_no);
+void print_delivered_msgs();
 
 void deliver_msg(int proc_no, int sequence_no, std::string msg);
 
-void check_buffered_msgs_and_deliver(int proc_no, int new_curr_clock_value, std::vector<int> & vector_clocks);
+int check_buffered_msgs_and_deliver(int curr_proc_no, int proc_no, int new_curr_clock_value, std::vector<int> & vector_clocks);
 
 #endif

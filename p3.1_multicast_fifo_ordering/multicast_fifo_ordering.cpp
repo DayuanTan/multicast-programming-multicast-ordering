@@ -171,12 +171,15 @@ void receiver(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc
             if (int(vector_clocks.at(recv_proc_no-1) + 1) == recv_clock_value){
                 // deliver msg
                 deliver_msg(recv_proc_no, recv_clock_value, received_msg_str);
+                // update vector_clocks
                 vector_clocks.at(recv_proc_no-1) = recv_clock_value; 
+                cout << "Vector_clocks updated: ";
+                print_vecotr_clocks(vector_clocks);
                 
                 // check buffered msg which meet requirement
                 check_buffered_msgs_and_deliver(recv_proc_no, recv_clock_value, vector_clocks);
 
-                cout << "Vector_clocks updated: ";
+                cout << "Vector_clocks updated  from buffered msgs: ";
                 print_vecotr_clocks(vector_clocks);
             }else{
                 // buffer msg
