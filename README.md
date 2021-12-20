@@ -145,7 +145,7 @@ After socket()  creates a [socket](https://man7.org/linux/man-pages/man7/socket.
 
 It's ok to don't change them in most cases. In previous [server-client socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) we have used SO_REUSEADDR | SO_REUSEPORT in *SOL_SOCKET level* to avoid address conflict. In multicast programming we need change more configurations in *IPPROTO_IP level*.  
 
-The actual fucntion we use set or get socket layer or protocol options are:
+The actual fucntions we use to set or get socket layer or protocol options are:
 [getsockopt(2) and setsockopt(2)](https://man7.org/linux/man-pages/man2/getsockopt.2.html): 
 
 ```cpp
