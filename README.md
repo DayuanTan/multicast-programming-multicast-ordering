@@ -362,7 +362,7 @@ memset(receiver_read_buffer, '\0', strlen(receiver_read_buffer));
 The below screenshot shows how I ran it with 1 sender 3 receiverrs. 
 1. Run ```make```.
 2. Run ```./receiver``` in multiple terminals. 
-3. Then run ```./sender``` in multiple ternimals. 
+3. Then run ```./sender``` in another ternimal. 
 
 (This implementation only receives one message you can modify it to receive multiple messages easily.)
 
