@@ -140,8 +140,8 @@ For this part, sender.cpp and receiver.cpp are  same.
 ## 4.1.3 Use *setsockopt()* to change default configurations of ***socket layer and protocol options***
 
 After socket()  creates a [socket](https://man7.org/linux/man-pages/man7/socket.7.html), it has many defualt configurations for both socket layer and protocol options. These configurations are also called "options", "flags" somewhere.
-- For the full list of **socket layer options** please refer to the [Socket options on this page](https://man7.org/linux/man-pages/man7/socket.7.html). They are *SOL_SOCKET level (which is 2nd argument)*. For example ```setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))```.
-- For the full list of **protocol options** please refer to the [Socket options on this page](https://man7.org/linux/man-pages/man7/ip.7.html). They are *IPPROTO_IP level*. For example ```setsockopt(server_socket_fd, IPPROTO_IP, IP_MULTICAST_LOOP, 0, 1)```. 
+- For the full list of **socket layer options** please refer to the ["Socket options" section on this page](https://man7.org/linux/man-pages/man7/socket.7.html). They are *SOL_SOCKET level (which is 2nd argument)*. For example ```setsockopt(server_socket_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))```.
+- For the full list of **protocol options** please refer to the ["Socket options" section on this page](https://man7.org/linux/man-pages/man7/ip.7.html). They are *IPPROTO_IP level*. For example ```setsockopt(server_socket_fd, IPPROTO_IP, IP_MULTICAST_LOOP, 0, 1)```. 
 
 It's ok to don't change them in most cases. In previous [server-client socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization) we have used SO_REUSEADDR | SO_REUSEPORT in *SOL_SOCKET level* to avoid address conflict. In multicast programming we need change more configurations in *IPPROTO_IP level*.  
 
