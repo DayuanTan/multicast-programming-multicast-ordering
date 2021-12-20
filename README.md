@@ -83,11 +83,11 @@ First of all we need **to implement multicast** (code are in [p2_multicast_progr
 
 ![](img/multicast_structure.png)
 
-Note: In below blocks, each block will have 3 lines of code, they all will follow this order and color style:
+Note: In below blocks, each block will have 3 blocks of code, they all will follow this order and color styles:
 ```diff
 function definition, or parameter order or definition
 
-- server-client socket programming
+- server-client socket (p2p) programming
 
 + multicast programming
 ```
