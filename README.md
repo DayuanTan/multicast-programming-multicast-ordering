@@ -4,6 +4,9 @@ Firstly I implemented the multicast socket programming cpp implementation in dis
 
 Secondly, based on that, I implemented multicast ordering for DS, including [FIFO ordering](p3.1_multicast_fifo_ordering) and [causal ordering](p3.2_multicast_causal_ordering).
 
+
+Videos to introduce and explain this repo: [Part1](https://youtu.be/tAjdDsG9QZE), [Part2](https://www.youtube.com/watch?v=xttLejh6K3o).
+
 ## Environments:
 
 All tests are on Ubuntu 16.04 LTS, g++ (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609. -std=c++11.
