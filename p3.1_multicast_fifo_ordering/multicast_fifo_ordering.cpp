@@ -75,8 +75,8 @@ void sender(int multicast_socket_fd, vector<int>& vector_clocks, int curr_proc_n
         exit(EXIT_FAILURE);
     }
 
-
-    for(int i = 0; i < 10; i++){
+    usleep( 2 * 1000000 ); //microseconds 10^6 = 1 second
+    for(int i = 0; i < 5; i++){
         // increaes self clock by 1 before sending
         vector_clocks.at(curr_proc_no-1) ++;
 

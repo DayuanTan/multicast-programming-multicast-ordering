@@ -164,14 +164,28 @@ vector<string> split(string s, string delimiter) {
 }
 
 
+void clean_proc_ctr(){
+    // clean the processes counter value
+    ofstream proc_ctr_file_modify;
+    proc_ctr_file_modify.open(PROCESSES_COUNTER_FILE_NAME, ios::trunc); // ios::trunc: previous content is deleted
+    if (proc_ctr_file_modify.is_open()){
+        // write into 
+        proc_ctr_file_modify << 0;
+        proc_ctr_file_modify.close();
+    } else {
+        cout << "Unable to open the '" << PROCESSES_COUNTER_FILE_NAME << "' file, please check the name!\n"; 
+        exit(-1);
+    }
+}
+
 // Define the function to be called when ctrl-c (SIGINT) is sent to process
 void signal_callback_handler(int signum) {
     cout << "\n\nCaught Ctrl+c signal  " << signum << endl;
 
-    int proc_ctr_current_value = processes_counter(-1);  // decrease counter by 1
     declare_processes_amount(0); // clean the declared proc amount
+    clean_proc_ctr(); // clean the proc ctr
     printf("Multicast: process stopped. \n");
-    cout << "There are still " << proc_ctr_current_value << " processes/nodes left in this DS now." << endl;
+    cout << "There are still " << processes_counter(0) << " processes/nodes left in this DS now." << endl;
 
 
     // Terminate program

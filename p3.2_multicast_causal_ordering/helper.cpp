@@ -187,7 +187,6 @@ void clean_proc_ctr(){
 void signal_callback_handler(int signum) {
     cout << "\n\nCaught Ctrl+c signal  " << signum << endl;
 
-    int proc_ctr_current_value = processes_counter(-1);  // decrease counter by 1
     declare_processes_amount(0); // clean the declared proc amount
     clean_proc_ctr(); // clean the proc ctr
     printf("Multicast: process stopped. \n");
