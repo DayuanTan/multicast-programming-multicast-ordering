@@ -111,7 +111,7 @@ group_address.sin_port = htons(5555);
 ```
 
 
-## 4.1.2 Use *SOCK_STREAM* for multicasting 
+## 4.1.2 Use *SOCK_DGRAM* for multicasting 
 
 For multicasting, it must be a *socket* of the family AF_INET and its type may be either SOCK_DGRAM or SOCK_RAW. The most common use is with **SOCK_DGRAM** sockets. Each multicast transmission is sent from a single network interface, even if the host has more than one multicasting-capable interface. It is a one-to-many transmission method.  You cannot use connection-oriented sockets of type SOCK_STREAM for multicasting.
 ```diff
