@@ -1,6 +1,6 @@
 # Multicast Programming and Multicast Ordering Implementation
 
-Firstly I implemented the multicast cpp implementation in distributed systems. Code are in [p2_multicast_programming](p2_multicast_programming) dir, and [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir. The latter one uses one process with 2 threads. One for sending messages while another one for continuously receiving messages from multicast group. 
+Firstly I implemented the multicast socket programming cpp implementation in distributed systems. Code are in [p2_multicast_programming](p2_multicast_programming) dir, and [p2.1_multicast_programming_2threads](p2.1_multicast_programming_2threads) dir. The latter one uses one process with 2 threads. One for sending messages while another one for continuously receiving messages from multicast group. 
 
 Secondly, based on that, I implemented multicast ordering for DS, including [FIFO ordering](p3.1_multicast_fifo_ordering) and [causal ordering](p3.2_multicast_causal_ordering).
 
@@ -79,7 +79,7 @@ This part asks for implementing two of FIFO ordering, Causal ordering and Total 
 
 # 4.1 Multicast programming (Phase 2.0)
 
-First of all we need **to implement multicast** (code are in [p2_multicast_programming](p2_multicast_programming) dir). It is little different than [server-client (p2p) socket programming](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization).
+First of all we need **to implement multicast sokect programming** (code are in [p2_multicast_programming](p2_multicast_programming) dir). It is little ***different*** than [***(server-client) peer-to-peer socket programming***](https://github.com/DayuanTan/DistributedOS-A-Centralized-Multi-User-Concurrent-Bank-Account-Manager-Multithread-Synchronization).
 
 ![](img/multicast_structure.png)
 
