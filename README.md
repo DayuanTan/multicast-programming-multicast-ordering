@@ -20,7 +20,9 @@ This assignment belongs to Proj2-Assignment2. More assignment details: [PDF here
 
 # Important Notice for Registered Students:
 <p>
-If your assignment/project is similar to this repo, this would be a good learning resources for you. But you are highly recommended to check your university/department/professor's rules about referring to internet resources. If there isn't a specific rule, you are highly recommended to ask your professor to elaborate it. Do they have open internet policy? Do they ask for listing references at the end of your report only, or indicating exactly which parts/blocks of your code re-use which references? Do they require the re-used code from internet sources cannot exceed a specific percentage of your whole submission?
+If your assignment/project is similar to this repo, this would be a good learning resources for you. One suggest is you go through this repo then close it when you write your own solution, and reference it correctly. 
+    
+You are highly recommended to check your university/department/professor's rules about referring to internet resources. If there isn't a specific rule, you are highly recommended to ask your professor to elaborate it. Do they have open-internet policy? Do they ask for listing references at the end of your report only, or indicating exactly which parts/blocks of your code re-use which references? Do they require the re-used code from internet sources cannot exceed a specific percentage of your whole submission?
     
 If your submisssion was similar with anyone else's, this would be a very bad situation in almost all universties. You should definitely avoid this.        
 </p>
