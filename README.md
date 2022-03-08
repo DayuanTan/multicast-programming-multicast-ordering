@@ -15,7 +15,7 @@ All tests are on Ubuntu 16.04 LTS, g++ (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20
 Implement the causal ordered multicasting for the distributed system. Create two threads for each process, one for sending the multicast message to other nodes and one for listening to its communication port. Use vector clocks to enforce the order of messages. Once a process delivers a received message to a user, it prints out the message on screen. You can assume that the number of processes (machines) is fixed (equal to or larger than 3) and processes will not fail, join, or leave the distributed system. Implement two versions of this program, one without causally ordered multicasting and one with this feature. Compare the results of the two programs.
 
 
-This assignment belongs to Proj2-Assignment2. More assignment details: [PDF here](Project2_Fall2021.pdf).
+This assignment belongs to Proj2-Assignment2. More assignment details: [PDF here](Project2_Fall2021.pdf). These are reference solutions when I worked as TA for this class.
 
 
 # Important Notice for Registered Students:
